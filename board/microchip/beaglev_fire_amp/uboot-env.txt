@@ -1,0 +1,20 @@
+# this assumes ${scriptaddr} is already set!!
+
+# Try to boot a fitImage from eMMC/SD
+
+setenv fdt_high 0xffffffffffffffff
+setenv initrd_high 0xffffffffffffffff
+
+fdt addr ${fdtcontroladdr}
+fdt get value board_compatible / compatible 1
+
+setenv fitconf conf-${board_compatible}
+
+load mmc 0:${distro_bootpart} ${scriptaddr} mpfs_beaglev_fire_amp.itb;
+bootm start ${scriptaddr}#${fitconf}#conf-microchip,beaglev-fire-amp;
+bootm loados ${scriptaddr};
+# Try to load a ramdisk if available inside fitImage
+bootm ramdisk;
+bootm prep;
+run design_overlays;
+bootm go;
