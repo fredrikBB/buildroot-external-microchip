@@ -1,0 +1,83 @@
+Add BeagleV-Fire FIT image template
+
+This patch adds the mpfs_beaglv_fire.its file which defines the FIT image
+structure for BeagleV-Fire platform, including the AMP device tree overlay.
+
+Signed-off-by: Community Contributor <community@example.com>
+
+--- /dev/null
++++ b/mpfs_beaglv_fire.its
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Flattened Image Tree file for BeagleV-Fire
++ *
++ * Copyright (C) 2022 Microchip Technology Inc. and its subsidiaries.
++ * Author: Conor Dooley <conor.dooley@microchip.com>
++ * Adapted for BeagleV-Fire by buildroot-external-microchip
++ *
++ */
++
++/dts-v1/;
++
++/ {
++	description = "U-Boot fitImage for the MPFS BeagleV-Fire";
++	#address-cells = <2>;
++
++		images {
++			kernel {
++				description = "Linux kernel";
++				data = /incbin/("./Image.gz");
++				type = "kernel";
++				arch = "riscv";
++				os = "linux";
++				compression = "gzip";
++				load = <0x80200000>;
++				entry = <0x80200000>;
++				hash-1 {
++					algo = "sha256";
++				};
++			};
++			fdt-beagle-beaglev-fire.dtb {
++				description = "Flattened Device Tree blob";
++				data = /incbin/("./dts/microchip/mpfs-beaglev-fire.dtb");
++				type = "flat_dt";
++				arch = "riscv";
++				compression = "none";
++				load = <0x8a000000>;
++				hash-1 {
++					algo = "sha256";
++				};
++			};
++			fdt-mpfs-beaglv-fire-amp.dtbo {
++				description = "Device Tree blob for AMP";
++				data = /incbin/("./mpfs_beaglv_fire/mpfs_beaglv_fire_amp.dtbo");
++				type = "flat_dt";
++				arch = "riscv";
++				compression = "none";
++				load = <0x8a0b0000>;
++				hash-1 {
++					algo = "sha256";
++				};
++			};
++		};
++
++		configurations {
++			default = "conf-beagle,beaglv-fire";
++			conf-beagle,beaglv-fire {
++				description = "1 Linux kernel, FDT blob";
++				kernel = "kernel";
++				fdt = "fdt-beagle-beaglev-fire.dtb";
++			};
++
++			conf-beagle,mpfs-beaglv-fire-amp {
++				description = "FDT overlay blob for AMP";
++				fdt = "fdt-mpfs-beaglv-fire-amp.dtbo";
++			};
++
++			conf-beagle,fdt-beagle-beaglv-fire.dtb {
++				description = "Base FDT blob for MPFS BeagleV-Fire board";
++				fdt = "fdt-beagle-beaglev-fire.dtb";
++			};
++		};
++};
