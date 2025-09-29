@@ -10,6 +10,17 @@ DT_OVERLAY_MCHP_LICENSE = GPL-2.0 MIT
 DT_OVERLAY_MCHP_LICENSE_FILES = COPYING LICENSES/GPL-2.0 LICENSES/MIT
 DT_OVERLAY_MCHP_DEPENDENCIES = linux host-uboot-tools
 
+# Add BeagleV-Fire support files after extraction
+define DT_OVERLAY_MCHP_ADD_BEAGLEV_FIRE_SUPPORT
+	# Copy BeagleV-Fire files
+	cp -r $(BR2_EXTERNAL_MCHP_PATH)/package/dt-overlay-mchp/beaglev-fire-files/* $(@D)/
+	# Update Makefile to include BeagleV-Fire support
+	sed -i 's/mpfs_icicle_amp mpfs_video/mpfs_icicle_amp mpfs_beaglev_fire mpfs_video/' $(@D)/Makefile
+	sed -i '/MPFS_ICICLE_AMP_DTBO_OBJECTS:=/a MPFS_BEAGLEV_FIRE_DTBO_OBJECTS:= $$(patsubst %.dtso,%.dtbo,$$(wildcard mpfs_beaglev_fire/*.dtso))' $(@D)/Makefile
+	sed -i '/mpfs_icicle_amp_dtbos: $$(MPFS_ICICLE_AMP_DTBO_OBJECTS)/a \\nmpfs_beaglev_fire_dtbos: $$(MPFS_BEAGLEV_FIRE_DTBO_OBJECTS)' $(@D)/Makefile
+endef
+DT_OVERLAY_MCHP_POST_EXTRACT_HOOKS += DT_OVERLAY_MCHP_ADD_BEAGLEV_FIRE_SUPPORT
+
 ifeq ($(BR2_PACKAGE_DT_OVERLAY_MCHP_ONLY),y)
 define DT_OVERLAY_MCHP_BUILD_CMDS
 	PATH="$(LINUX_DIR)/scripts/dtc:$(HOST_DIR)/bin:$(PATH)" $(MAKE) DTC="$(LINUX_DIR)/scripts/dtc/dtc" KERNEL_DIR="$(LINUX_DIR)" -C $(@D) $(BR2_PACKAGE_DT_OVERLAY_MCHP_PLATFORM)_dtbos
