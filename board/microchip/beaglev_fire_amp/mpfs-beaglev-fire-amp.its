@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Flattened Image Tree file for BeagleV-Fire AMP
+ *
+ * Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
+ * Adapted from Icicle AMP configuration
+ */
+
+/dts-v1/;
+
+/ {
+    description = "U-Boot fitImage for BeagleV-Fire AMP";
+    #address-cells = <2>;
+
+    images {
+        kernel {
+            description = "Linux kernel";
+            data = /incbin/("Image.gz");
+            type = "kernel";
+            arch = "riscv";
+            os = "linux";
+            compression = "gzip";
+            load = <0x0 0x80200000>;
+            entry = <0x0 0x80200000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt-base {
+            description = "BeagleV-Fire base device tree";
+            data = /incbin/("microchip/mpfs-beaglev-fire.dtb");
+            type = "flat_dt";
+            arch = "riscv";
+            compression = "none";
+            load = <0x0 0x8a000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt-amp {
+            description = "BeagleV-Fire AMP device tree";
+            data = /incbin/("mpfs-beaglev-fire-amp.dtb");
+            type = "flat_dt";
+            arch = "riscv";
+            compression = "none";
+            load = <0x0 0x8a000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+    };
+
+    configurations {
+        default = "conf-base";
+
+        conf-base {
+            description = "BeagleV-Fire base configuration";
+            kernel = "kernel";
+            fdt = "fdt-base";
+        };
+
+        conf-amp {
+            description = "BeagleV-Fire AMP configuration";
+            kernel = "kernel";
+            fdt = "fdt-amp";
+        };
+    };
+};

@@ -1,6 +1,13 @@
 # BeagleV-Fire AMP Demo
 
-This directory contains the complete BeagleV-Fire AMP (Asymmetric MultiProcessing) demo configuration, successfully ported from the PolarFire SoC Icicle Kit.
+This directory contains the complete BeagleV-Fire AMP (Asymmetric MultiProcessing) demo configuration, successfully ported from the Icicle AMP demo. **Verify FIT Image**:
+   ```bash
+   # Check FIT image structure  
+   output/host/bin/dumpimage -l output/images/mpfs_beaglv_fire_amp.itb
+   
+   # Verify board-specific files are used
+   ls -la output/images/mpfs-beaglv-fire-amp.dtb
+   ```it.
 
 ## Overview
 
@@ -8,47 +15,49 @@ The AMP demo runs Linux on cores u54_1, u54_2, u54_3 and FreeRTOS on core u54_4,
 
 ## Implementation
 
-This BeagleV-Fire AMP configuration integrates with the `dt-overlay-mchp` package to provide device tree overlay support. The implementation uses a post-extract hook approach that automatically includes BeagleV-Fire overlay files during the build process.
+This BeagleV-Fire AMP configuration uses a simplified board-specific approach similar to the Icicle AMP configuration. All AMP-specific files are maintained locally in this board directory.
 
 ### Key Configuration
-- **Platform**: `BR2_PACKAGE_DT_OVERLAY_MCHP_PLATFORM="mpfs_beaglev_fire"`
-- **Device Tree Overlay**: Automatic build of `mpfs_beaglev_fire_amp.dtbo`
-- **FIT Image**: Generated as `mpfs_beaglev_fire_amp.itb` with kernel + overlays
+- **Device Tree**: Custom AMP device tree with all modifications included
+- **FIT Image**: Single board-specific `.its` file generates `mpfs_beaglev_fire_amp.itb`
+- **Boot Script**: Simple `bootm` command loads AMP configuration directly
 
 ### Files in this Directory
 
 #### Board Configuration Files  
+- `mpfs-beaglv-fire-amp.its` - FIT image template (kernel + base DT + AMP DT)
+- `mpfs-beaglv-fire-amp.dts` - Complete AMP device tree with all modifications
 - `config.yaml` - HSS payload generator configuration for AMP
 - `linux.fragment` - Kernel configuration fragment for AMP support
 - `uboot-fragment.config` - U-Boot configuration fragment with AMP bootargs
 - `genimage.cfg` - Image generation configuration for SD card
 - `uEnv.txt` - U-Boot environment variables
-- `uboot-env.txt` - Boot script for AMP configuration
-- `post-build.sh` - Script to copy device tree overlays to boot partition
-- `post-image.sh` - Script for FIT image generation
+- `uboot-env.txt` - Simple AMP boot script
+- `post-build.sh` - Post-build processing script
+- `post-image.sh` - FIT image generation script
 
-#### Device Tree Overlay Integration
-The BeagleV-Fire device tree overlays are maintained in:
-- `package/dt-overlay-mchp/beaglev-fire-files/mpfs_beaglev_fire.its` - FIT image template
-- `package/dt-overlay-mchp/beaglev-fire-files/mpfs_beaglev_fire/mpfs_beaglev_fire_amp.dtso` - AMP overlay
-
-These files are automatically integrated into the dt-overlay-mchp package build via post-extract hooks.
+#### Implementation Approach
+This approach eliminates the complexity of overlay extraction and provides:
+- **Direct AMP device tree**: All AMP modifications in a single `.dts` file
+- **Simple boot process**: Standard U-Boot `bootm` command with configuration selection
+- **Local control**: All BeagleV-Fire AMP files maintained in this board directory
+- **Proven architecture**: Follows the successful Icicle AMP pattern
 
 ## Technical Implementation
 
-### Post-Extract Hook Architecture
-This BeagleV-Fire AMP configuration uses an innovative approach for device tree overlay integration:
+### Board-Specific Architecture
+This BeagleV-Fire AMP configuration uses a simplified board-specific approach:
 
-1. **Local Control**: BeagleV-Fire overlay files are maintained locally in the buildroot-external-microchip repository
-2. **Automatic Integration**: A post-extract hook (`DT_OVERLAY_MCHP_ADD_BEAGLEV_FIRE_SUPPORT`) copies files into the dt-overlay-mchp build directory
-3. **Makefile Patching**: The hook automatically updates the dt-overlay-mchp Makefile to include BeagleV-Fire platform support
-4. **Build-time Resolution**: Files are integrated during the package extract phase, ensuring consistent builds
+1. **Self-Contained**: All BeagleV-Fire AMP files are maintained in this board directory
+2. **Direct Device Tree Build**: Custom AMP device tree built directly via `BR2_LINUX_KERNEL_CUSTOM_DTS_PATH`
+3. **FIT Image Generation**: Board-specific `.its` file creates the complete AMP boot image
+4. **No External Dependencies**: No reliance on dt-overlay-mchp or other external packages
 
 This approach provides several advantages:
-- **Independence**: No dependency on upstream dt-overlay-mchp repository for BeagleV-Fire support
-- **Maintainability**: Local control over BeagleV-Fire-specific overlays and templates
-- **Reliability**: Automatic integration eliminates manual patching steps
-- **Consistency**: Ensures BeagleV-Fire support is always available regardless of upstream changes
+- **Simplicity**: Single board directory contains all necessary files
+- **Maintainability**: Direct control over all AMP-specific configuration
+- **Reliability**: No complex package integration or post-extract hooks
+- **Consistency**: Self-contained approach ensures reproducible builds
 
 ## Prerequisites
 
@@ -95,10 +104,10 @@ Replace `/dev/sdX` with your SD card device.
 - Hart entry points configured for BeagleV-Fire memory layout
 - Payload configuration adapted for BeagleV-Fire device tree
 
-### Device Tree Overlays
-- Base device tree: `microchip/mpfs-beaglev-fire.dtb`
-- AMP overlay: `mpfs_beaglev_fire_amp.dtbo` (built from dt-overlay-mchp package)
-- Automatic integration via post-extract hooks in dt-overlay-mchp
+### Device Tree Configuration
+- Base device tree: `microchip/mpfs-beaglev-fire.dtb` (from Linux kernel)
+- AMP device tree: `mpfs-beaglv-fire-amp.dtb` (built from board-specific `.dts` file)
+- Both device trees included in FIT image with configurations: `conf-base` (regular) and `conf-amp` (AMP mode)
 
 ### U-Boot Configuration  
 - Uses `beaglv_fire` U-Boot defconfig as base (shared with non-AMP configuration)
@@ -172,17 +181,17 @@ If MPFS_AMP_EXAMPLES is enabled, example applications will be available in `/lib
    # Check FIT image structure  
    output/host/bin/dumpimage -l output/images/mpfs_beaglev_fire_amp.itb
    
-   # Verify dt-overlay-mchp integration
-   ls -la output/build/dt-overlay-mchp-*/mpfs_beaglev_fire/
+   # Verify board-specific files are used
+   ls -la output/images/mpfs-beaglv-fire-amp.dtb
    ```
 
-3. **Check BeagleV-Fire Integration**:
+3. **Check AMP Device Tree**:
    ```bash
-   # Verify post-extract hook worked
-   grep -r "beaglev_fire" output/build/dt-overlay-mchp-*/Makefile
+   # Verify AMP device tree was built
+   ls output/images/mpfs-beaglv-fire-amp.dtb
    
-   # Check overlay files were copied
-   ls output/build/dt-overlay-mchp-*/mpfs_beaglev_fire*
+   # Check FIT image contains both device trees
+   output/host/bin/dumpimage -l output/images/mpfs_beaglv_fire_amp.itb
    ```
 
 3. **Console Output**:
@@ -198,8 +207,9 @@ The configuration supports device tree overlays for FPGA fabric interfaces. Over
 ### Package Configuration
 - Uses `linux4microchip+fpga-2025.07` kernel/u-boot versions
 - Includes MPFS examples and AMP-specific packages (`BR2_PACKAGE_MPFS_AMP_EXAMPLES=y`)
-- Device tree overlay support: `BR2_PACKAGE_DT_OVERLAY_MCHP=y` with `mpfs_beaglev_fire` platform
-- Post-extract hook automatically adds BeagleV-Fire overlay files to dt-overlay-mchp build
+- Custom device tree support: Board-specific AMP device tree built via `BR2_LINUX_KERNEL_CUSTOM_DTS_PATH`
+- Board-specific FIT image: Generated from local `.its` file in post-image.sh
+- Self-contained approach: No external package dependencies
 
 ### External Dependencies
 The AMP examples depend on:
