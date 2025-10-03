@@ -1,23 +1,20 @@
-# BeagleV-Fire AMP Boot Environment
-# Supports boot-time selection between base and AMP configurations
+# this assumes ${scriptaddr} is already set!!
+
+# Try to boot a fitImage from eMMC/SD
 
 setenv fdt_high 0xffffffffffffffff
 setenv initrd_high 0xffffffffffffffff
 
-# Check for amp_mode environment variable
-# Set with: setenv amp_mode 1; saveenv (for AMP mode)
-# Or:       setenv amp_mode 0; saveenv (for base mode)
+fdt addr ${fdtcontroladdr}
+fdt get value board_compatible / compatible 1
 
-if test "${amp_mode}" = "1"; then
-    echo "Booting AMP configuration...";
-    load mmc 0:2 ${scriptaddr} mpfs_beaglev_fire_amp.itb;
-    bootm start ${scriptaddr}#conf-amp;
-else
-    echo "Booting base configuration...";
-    load mmc 0:2 ${scriptaddr} mpfs_beaglev_fire_amp.itb;
-    bootm start ${scriptaddr}#conf-base;
-fi;
+setenv fitconf conf-${board_compatible}
+
+load mmc 0:${distro_bootpart} ${scriptaddr} mpfs_beaglev_fire_amp.itb;
+bootm start ${scriptaddr}#${fitconf}#conf-microchip,mpfs-beaglev-fire-amp;
 bootm loados ${scriptaddr};
+# Try to load a ramdisk if available inside fitImage
 bootm ramdisk;
 bootm prep;
+run design_overlays;
 bootm go;

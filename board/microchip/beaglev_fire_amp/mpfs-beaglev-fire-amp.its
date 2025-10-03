@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Flattened Image Tree file for BeagleV-Fire AMP
- *
- * Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
- * Adapted from Icicle AMP configuration
+ * Uses base device tree + overlay approach like Icicle AMP
  */
 
 /dts-v1/;
@@ -27,9 +25,9 @@
             };
         };
 
-        fdt-base {
+        fdt {
             description = "BeagleV-Fire base device tree";
-            data = /incbin/("microchip/mpfs-beaglev-fire.dtb");
+            data = /incbin/("dts/microchip/mpfs-beaglev-fire.dtb");
             type = "flat_dt";
             arch = "riscv";
             compression = "none";
@@ -39,13 +37,13 @@
             };
         };
 
-        fdt-amp {
-            description = "BeagleV-Fire AMP device tree";
-            data = /incbin/("mpfs-beaglev-fire-amp.dtb");
+        fdt-mpfs-beaglev-fire-amp.dtbo {
+            description = "BeagleV-Fire AMP overlay";
+            data = /incbin/("mpfs_beaglev_fire/mpfs_beaglev_fire_amp.dtbo");
             type = "flat_dt";
             arch = "riscv";
             compression = "none";
-            load = <0x0 0x8a000000>;
+            load = <0x0 0x8a080000>;
             hash-1 {
                 algo = "sha256";
             };
@@ -53,18 +51,20 @@
     };
 
     configurations {
-        default = "conf-base";
+        default = "conf-microchip,mpfs-beaglev-fire";
 
-        conf-base {
+        "conf-microchip,mpfs-beaglev-fire" {
             description = "BeagleV-Fire base configuration";
             kernel = "kernel";
-            fdt = "fdt-base";
+            fdt = "fdt";
+            hash-1 {
+                algo = "sha256";
+            };
         };
 
-        conf-amp {
-            description = "BeagleV-Fire AMP configuration";
-            kernel = "kernel";
-            fdt = "fdt-amp";
+        "conf-microchip,mpfs-beaglev-fire-amp" {
+            description = "BeagleV-Fire AMP overlay";
+            fdt = "fdt-mpfs-beaglev-fire-amp.dtbo";
         };
     };
 };
