@@ -15,7 +15,7 @@ DTC="${HOST_DIR}/bin/dtc"
 KERNEL_DIR="${BUILD_DIR}/linux-custom"
 
 # Compile the overlay
-"${HOST_DIR}/bin/cpp" -E -nostdinc \
+"${HOST_DIR}/bin/riscv64-buildroot-linux-gnu-cpp" -E -nostdinc \
 	-I"${KERNEL_DIR}/include" \
 	-I"${KERNEL_DIR}/arch/riscv/boot/dts" \
 	-I"${KERNEL_DIR}/arch/riscv/boot/dts/microchip" \
