@@ -3,7 +3,7 @@ set -e
 
 GENIMAGE_CFG="$2"
 MKIMAGE="${HOST_DIR}"/bin/mkimage
-BOARD_DIR="$(pwd)"/"${0%/*}"
+BOARD_DIR="${0%/*}"
 
 pushd "${BINARIES_DIR}"
 mkdir -p dts
