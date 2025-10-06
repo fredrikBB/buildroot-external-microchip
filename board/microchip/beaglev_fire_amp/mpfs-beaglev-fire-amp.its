@@ -53,7 +53,7 @@
     configurations {
         default = "conf-microchip,mpfs-beaglev-fire";
 
-        "conf-microchip,mpfs-beaglev-fire" {
+        conf-microchip,mpfs-beaglev-fire {
             description = "BeagleV-Fire base configuration";
             kernel = "kernel";
             fdt = "fdt";
@@ -62,7 +62,7 @@
             };
         };
 
-        "conf-microchip,mpfs-beaglev-fire-amp" {
+        conf-microchip,mpfs-beaglev-fire-amp {
             description = "BeagleV-Fire AMP overlay";
             fdt = "fdt-mpfs-beaglev-fire-amp.dtbo";
         };
