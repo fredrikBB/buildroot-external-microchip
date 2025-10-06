@@ -36,7 +36,8 @@ do
   fi
 done
 
-gzip -9 Image -c > Image.gz
+gzip -9 -f Image -c > Image.gz
+cp "${BOARD_DIR}/mpfs-beaglev-fire-amp.its" .
 "${MKIMAGE}" -f mpfs-beaglev-fire-amp.its mpfs_beaglev_fire_amp.itb
 popd
 support/scripts/genimage.sh -c "${GENIMAGE_CFG}"
