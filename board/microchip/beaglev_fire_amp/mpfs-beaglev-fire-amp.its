@@ -51,9 +51,9 @@
     };
 
     configurations {
-        default = "conf-microchip,mpfs-beaglev-fire";
+        default = "conf-microchip,mpfs";
 
-        conf-microchip,mpfs-beaglev-fire {
+        conf-microchip,mpfs {
             description = "BeagleV-Fire base configuration";
             kernel = "kernel";
             fdt = "fdt";

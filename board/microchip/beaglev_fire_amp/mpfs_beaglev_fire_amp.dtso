@@ -10,7 +10,7 @@
 /plugin/;
 
 / {
-	compatible = "microchip,mpfs-beaglev-fire", "microchip,mpfs";
+	compatible = "beagle,beaglev-fire", "microchip,mpfs";
 };
 
 &{/} {
