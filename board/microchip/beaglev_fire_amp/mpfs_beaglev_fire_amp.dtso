@@ -69,6 +69,8 @@
 	status = "disabled"; // in use by context b
 };
 
+/* Could not find wdt4 in the BeagleV-Fire kernel device tree blob
 &wdt4 {
 	status = "disabled";
 };
+*/
