@@ -26,6 +26,8 @@ config BR2_PACKAGE_DT_OVERLAY_MCHP_ONLY
 	bool "dtbos only"
 
 config BR2_PACKAGE_DT_OVERLAY_MCHP_FIT
-	bool "FIT image"
+        bool "FIT image"
+
 endchoice
+
 endif

@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Flattened Image Tree file for BeagleV-Fire AMP
+ * Uses base device tree + overlay approach like Icicle AMP
+ */
+
+/dts-v1/;
+
+/ {
+    description = "U-Boot fitImage for BeagleV-Fire AMP";
+    #address-cells = <2>;
+
+    images {
+        kernel {
+            description = "Linux kernel";
+            data = /incbin/("Image.gz");
+            type = "kernel";
+            arch = "riscv";
+            os = "linux";
+            compression = "gzip";
+            load = <0x0 0x80200000>;
+            entry = <0x0 0x80200000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt {
+            description = "BeagleV-Fire base device tree";
+            data = /incbin/("dts/microchip/mpfs-beaglev-fire.dtb");
+            type = "flat_dt";
+            arch = "riscv";
+            compression = "none";
+            load = <0x0 0x8a000000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt-mpfs-beaglev-fire-amp.dtbo {
+            description = "BeagleV-Fire AMP overlay";
+            data = /incbin/("mpfs_beaglev_fire/mpfs_beaglev_fire_amp.dtbo");
+            type = "flat_dt";
+            arch = "riscv";
+            compression = "none";
+            load = <0x0 0x8a080000>;
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+    };
+
+    configurations {
+        default = "conf-microchip,mpfs";
+
+        conf-microchip,mpfs {
+            description = "BeagleV-Fire base configuration";
+            kernel = "kernel";
+            fdt = "fdt";
+            hash-1 {
+                algo = "sha256";
+            };
+        };
+
+        conf-microchip,mpfs-beaglev-fire-amp {
+            description = "BeagleV-Fire AMP overlay";
+            fdt = "fdt-mpfs-beaglev-fire-amp.dtbo";
+        };
+    };
+};
